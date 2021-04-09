@@ -11,6 +11,7 @@
 struct Data
 {
   std::string id;
+  int idNumber;
   std::string flags;
   float nominalLed;
   std::vector<float> temperatures;
@@ -22,6 +23,7 @@ struct Data
     id = "none";
     flags = "none";
 
+    idNumber = 99;
     nominalLed = 99;
 
     std::vector<float>().swap(temperatures);
@@ -82,6 +84,7 @@ int main()
 	  float currentTemp = 0;
 	  int currentVsldac, currentAdc = 0;
 	  int currentDet = -1;
+	  int currentIdNumber = -1;
 
 	  // Loop over elements of the current line and get the data for that SiPM
 	  while(iss >> element)
@@ -104,12 +107,15 @@ int main()
 	      iterator++;
 	    }
 
+	  currentIdNumber = atoi(currentID.substr(2,3).c_str());
+	  
 	  currentTemp = (4.363391*currentAdc/65536) / (0.07667*currentVsldac/(currentDet==0 ? 4096:16384)) + 1.01;
 
 	  
 	  if (i == 0) //First file, create the mapping
 	    {
 	      sipmData.id = currentID;
+	      sipmData.idNumber = currentIdNumber;
 	      sipmData.ledValues.push_back(currentLed);
 	      sipmData.temperatures.push_back(currentTemp);
 
@@ -158,6 +164,31 @@ int main()
 
   TGraph *graphLed;
   TGraph *graphTemp;
+
+  TH1F *E_normLED_R1to30_Vm0p5 = new TH1F("E_normLED_R1to30_Vm0p5", "ECal Rows 1-30 Normalized LEDs at -0.5 V;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+  TH1F *E_normLED_R31to34_Vm0p5 = new TH1F("E_normLED_R31to34_Vm0p5", "ECal Rows 31-34 Normalized LEDs at -0.5 V;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+
+  TH1F *E_normLED_R1to30_Vm0p5_temp22to23 = new TH1F("E_normLED_R1to30_Vm0p5_temp22to23", "ECal Rows 1-30 at -0.5 V and 22 #leq T_{avg} < 23;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+  TH1F *E_normLED_R31to34_Vm0p5_temp22to23 = new TH1F("E_normLED_R31to34_Vm0p5_temp22to23", "ECal Rows 31-34 at -0.5 V and 22 #leq T_{avg} < 23;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+
+  TH1F *E_normLED_R1to30_Vm0p5_temp23to24 = new TH1F("E_normLED_R1to30_Vm0p5_temp23to24", "ECal Rows 1-30 at -0.5 V and 23 #leq T_{avg} < 24;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+  TH1F *E_normLED_R31to34_Vm0p5_temp23to24 = new TH1F("E_normLED_R31to34_Vm0p5_temp23to24", "ECal Rows 31-34 at -0.5 V and 23 #leq T_{avg} < 24;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+
+  TH1F *E_normLED_R1to30_Vm0p5_temp24to25 = new TH1F("E_normLED_R1to30_Vm0p5_temp24to25", "ECal Rows 1-30 at -0.5 V and 24 #leq T_{avg} < 25;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+  TH1F *E_normLED_R31to34_Vm0p5_temp24to25 = new TH1F("E_normLED_R31to34_Vm0p5_temp24to25", "ECal Rows 31-34 at -0.5 V and 24 #leq T_{avg} < 25;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+
+  TH1F *E_normLED_R1to30_Vm0p5_temp25to26 = new TH1F("E_normLED_R1to30_Vm0p5_temp25to26", "ECal Rows 1-30 at -0.5 V and 25 #leq T_{avg} < 26;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+  //TH1F *E_normLED_R31to34_Vm0p5_temp25to26 = new TH1F("E_normLED_R31to34_Vm0p5_temp25to26", "ECal Rows 31-34 at -0.5 V and 25 #leq T_{avg} < 26;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+
+  TH1F *E_normLED_R1to30_Vm0p5_temp26to27 = new TH1F("E_normLED_R1to30_Vm0p5_temp26to27", "ECal Rows 1-30 at -0.5 V and 26 #leq T_{avg} < 27;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+  //TH1F *E_normLED_R31to34_Vm0p5_temp26to27 = new TH1F("E_normLED_R31to34_Vm0p5_temp26to27", "ECal Rows 31-34 at -0.5 V and 26 #leq T_{avg} < 27;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+
+  /*
+  TH1F *E_normLED_R1to30_Vm0p5_temp27to28 = new TH1F("E_normLED_R1to30_Vm0p5_temp27to28", "ECal Rows 1-30 at -0.5 V and 27 #leq T_{avg} < 28;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+  TH1F *E_normLED_R31to34_Vm0p5_temp27to28 = new TH1F("E_normLED_R31to34_Vm0p5_temp27to28", "ECal Rows 31-34 at -0.5 V and 27 #leq T_{avg} < 28;LED/LED_{nominal};Towers", 100, 0.5, 0.7);
+  */
+  TH1F *E_rawLED_R1to30_Vm0p5 = new TH1F("E_rawLED_R1to30_Vm0p5", "ECal Rows 1-30 Raw LEDs at -0.5 V;LED;Towers", 200, 200, 2600);
+  TH1F *E_rawLED_R31to34_Vm0p5 = new TH1F("E_rawLED_R31to34_Vm0p5", "ECal Rows 31-34 Raw LEDs at -0.5 V;LED;Towers", 200, 500, 3250);
 
   TH1F *EN_tempsAtVm0p5 = new TH1F("EN_tempsAtVm0p5", "EN Temps at V_{nom}- 0.5;Temperature (#circC);Towers", 200, 20, 30);
   TH1F *ES_tempsAtVm0p5 = new TH1F("ES_tempsAtVm0p5", "ES Temps at V_{nom}- 0.5;Temperature (#circC);Towers", 200, 20, 30);
@@ -277,6 +308,47 @@ int main()
 
       if ((it->second.flags).compare("none") == 0)
 	{
+	  if ((it->first.substr(0,1)).compare("E") == 0 && it->second.idNumber < 660)
+	    {
+	      E_normLED_R1to30_Vm0p5->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed);
+	      E_rawLED_R1to30_Vm0p5->Fill(it->second.ledValues.at(indexM0p5));
+
+	      if (avgTemp >= 22.0 && avgTemp < 23.0)
+		{ E_normLED_R1to30_Vm0p5_temp22to23->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
+	      else if (avgTemp >= 23.0 && avgTemp < 24.0)
+		{ E_normLED_R1to30_Vm0p5_temp23to24->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
+	      else if (avgTemp >= 24.0 && avgTemp < 25.0)
+		{ E_normLED_R1to30_Vm0p5_temp24to25->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
+	      else if (avgTemp >= 25.0 && avgTemp < 26.0)
+		{ E_normLED_R1to30_Vm0p5_temp25to26->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
+	      else if (avgTemp >= 26.0 && avgTemp < 27.0)
+		{ E_normLED_R1to30_Vm0p5_temp26to27->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
+	      /*
+	      else if (avgTemp >= 27.0 && avgTemp < 28.0)
+		{ E_normLED_R1to30_Vm0p5_temp27to28->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
+	      */
+	    }
+	  else if ((it->first.substr(0,1)).compare("E") == 0 && it->second.idNumber >= 660)
+	    {
+	      E_normLED_R31to34_Vm0p5->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed);
+	      E_rawLED_R31to34_Vm0p5->Fill(it->second.ledValues.at(indexM0p5));
+
+	      if (avgTemp >= 22.0 && avgTemp < 23.0)
+		{ E_normLED_R31to34_Vm0p5_temp22to23->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
+	      else if (avgTemp >= 23.0 && avgTemp < 24.0)
+		{ E_normLED_R31to34_Vm0p5_temp23to24->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
+	      else if (avgTemp >= 24.0 && avgTemp < 25.0)
+		{ E_normLED_R31to34_Vm0p5_temp24to25->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
+	      /*
+	      else if (avgTemp >= 25.0 && avgTemp < 26.0)
+		{ E_normLED_R31to34_Vm0p5_temp25to26->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
+	      else if (avgTemp >= 26.0 && avgTemp < 27.0)
+		{ E_normLED_R31to34_Vm0p5_temp26to27->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
+	      else if (avgTemp >= 27.0 && avgTemp < 28.0)
+		{ E_normLED_R31to34_Vm0p5_temp27to28->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
+	      */
+	    }
+	  
 	  if ((it->first.substr(0,2)).compare("EN") == 0)
 	    {
 	      EN_tempsAtVm0p5->Fill(it->second.temperatures.at(indexM0p5));
@@ -295,6 +367,30 @@ int main()
     }// End loop through idToDataMap
 
   totalResultsFile->cd();
+
+  E_normLED_R1to30_Vm0p5->Write();
+  E_normLED_R31to34_Vm0p5->Write();
+
+  E_normLED_R1to30_Vm0p5_temp22to23->Write();
+  E_normLED_R31to34_Vm0p5_temp22to23->Write();
+
+  E_normLED_R1to30_Vm0p5_temp23to24->Write();
+  E_normLED_R31to34_Vm0p5_temp23to24->Write();
+
+  E_normLED_R1to30_Vm0p5_temp24to25->Write();
+  E_normLED_R31to34_Vm0p5_temp24to25->Write();
+
+  E_normLED_R1to30_Vm0p5_temp25to26->Write();
+  //E_normLED_R31to34_Vm0p5_temp25to26->Write();
+
+  E_normLED_R1to30_Vm0p5_temp26to27->Write();
+  //E_normLED_R31to34_Vm0p5_temp26to27->Write();
+
+  //E_normLED_R1to30_Vm0p5_temp27to28->Write();
+  //E_normLED_R31to34_Vm0p5_temp27to28->Write();
+
+  E_rawLED_R1to30_Vm0p5->Write();
+  E_rawLED_R31to34_Vm0p5->Write();
 
   EN_tempsAtVm0p5->Write();
   ES_tempsAtVm0p5->Write();
