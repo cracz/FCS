@@ -37,11 +37,11 @@ struct Data
 //void analyzeLED()
 int main()
 {
-  std::string fileName_minus1   = "compiledInfo_1107038.tsv";  // Marked as useless
-  std::string fileName_minus0p5 = "compiledInfo_1107039.tsv";
-  std::string fileName_plus0p5  = "compiledInfo_1107040.tsv";
-  std::string fileName_plus1    = "compiledInfo_1107041.tsv";
-  std::string fileName_nominal  = "compiledInfo_1107042.tsv";
+  //std::string fileName_minus1   = "compiledInfo_1107038.tsv";  // Marked as useless
+  std::string fileName_minus0p5 = "compiledInfo_22098021.tsv";
+  std::string fileName_plus0p5  = "compiledInfo_22098022.tsv";
+  std::string fileName_plus1    = "compiledInfo_22098023.tsv";
+  std::string fileName_nominal  = "compiledInfo_22098020.tsv";
 
   std::string fileNameList[4] = { fileName_minus0p5, fileName_nominal, fileName_plus0p5, fileName_plus1 };
 
@@ -119,17 +119,18 @@ int main()
 	      sipmData.ledValues.push_back(currentLed);
 	      sipmData.temperatures.push_back(currentTemp);
 
-	      if (currentFlags.compare("0_Good") != 0)
+	      if (currentFlags.compare("0_Good") == 0 || currentFlags.compare("0_Good_TooManyLedRatioBad") == 0) {} // Good
+	      else
 		sipmData.flags = "flagsFound";
 	      
-	      if (fileNameList[i].find("1107042") != std::string::npos)
+	      if (fileNameList[i].find("22098020") != std::string::npos)
 		{
 		  sipmData.nominalLed = currentLed;
 		  sipmData.deltaV.push_back(0.0);
 		}
-	      else if (fileNameList[i].find("1107039") != std::string::npos) { sipmData.deltaV.push_back(-0.5); }
-	      else if (fileNameList[i].find("1107040") != std::string::npos) { sipmData.deltaV.push_back(0.5); }
-	      else if (fileNameList[i].find("1107041") != std::string::npos) { sipmData.deltaV.push_back(1.0); }
+	      else if (fileNameList[i].find("22098021") != std::string::npos) { sipmData.deltaV.push_back(-0.5); }
+	      else if (fileNameList[i].find("22098022") != std::string::npos) { sipmData.deltaV.push_back(0.5); }
+	      else if (fileNameList[i].find("22098023") != std::string::npos) { sipmData.deltaV.push_back(1.0); }
 
 	      idToDataMap[currentID] = sipmData;
 	    }
@@ -138,17 +139,18 @@ int main()
 	      idToDataMap[currentID].ledValues.push_back(currentLed);
 	      idToDataMap[currentID].temperatures.push_back(currentTemp);
 
-	      if (currentFlags.compare("0_Good") != 0)
+	      if (currentFlags.compare("0_Good") != 0 || currentFlags.compare("0_Good_TooManyLedRatioBad") == 0) {} // Good
+	      else 
 		idToDataMap[currentID].flags = "flagsFound";
 	      
-	      if (fileNameList[i].find("1107042") != std::string::npos)
+	      if (fileNameList[i].find("22098020") != std::string::npos)
 		{
 		  idToDataMap[currentID].nominalLed = currentLed;
 		  idToDataMap[currentID].deltaV.push_back(0.0);
 		}
-	      else if (fileNameList[i].find("1107039") != std::string::npos) { idToDataMap[currentID].deltaV.push_back(-0.5); }
-	      else if (fileNameList[i].find("1107040") != std::string::npos) { idToDataMap[currentID].deltaV.push_back(0.5); }
-	      else if (fileNameList[i].find("1107041") != std::string::npos) { idToDataMap[currentID].deltaV.push_back(1.0); }
+	      else if (fileNameList[i].find("22098021") != std::string::npos) { idToDataMap[currentID].deltaV.push_back(-0.5); }
+	      else if (fileNameList[i].find("22098022") != std::string::npos) { idToDataMap[currentID].deltaV.push_back(0.5); }
+	      else if (fileNameList[i].find("22098023") != std::string::npos) { idToDataMap[currentID].deltaV.push_back(1.0); }
 	    }
 
 
