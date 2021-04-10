@@ -139,7 +139,7 @@ int main()
 	      idToDataMap[currentID].ledValues.push_back(currentLed);
 	      idToDataMap[currentID].temperatures.push_back(currentTemp);
 
-	      if (currentFlags.compare("0_Good") != 0 || currentFlags.compare("0_Good_TooManyLedRatioBad") == 0) {} // Good
+	      if (currentFlags.compare("0_Good") == 0 || currentFlags.compare("0_Good_TooManyLedRatioBad") == 0) {} // Good
 	      else 
 		idToDataMap[currentID].flags = "flagsFound";
 	      
