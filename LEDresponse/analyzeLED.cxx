@@ -7,6 +7,8 @@
 #include "TFile.h"
 #include "TGraph.h"
 #include "TH1.h"
+#include "TCanvas.h"
+#include "TStyle.h"
 
 struct Data
 {
@@ -17,11 +19,20 @@ struct Data
   std::vector<float> temperatures;
   std::vector<float> ledValues;
   std::vector<float> deltaV;
+  bool flagAtVm0p5;
+  bool flagAtVnominal;
+  bool flagAtVp0p5;
+  bool flagAtVp1p0;
 
   void reset()
   {
     id = "none";
     flags = "none";
+
+    flagAtVm0p5 = false;
+    flagAtVnominal = false;
+    flagAtVp0p5 = false;
+    flagAtVp1p0 = false;
 
     idNumber = 99;
     nominalLed = 99;
@@ -62,6 +73,10 @@ int main()
     {
       std::ifstream inputStream(fileNameList[i].c_str());
       if (!inputStream.is_open()) { std::cout << "File " << i << " not found!" << std::endl; }
+
+      std::string runNum = fileNameList[i].substr(13, 8);
+      std::string flagOutName = "flagged_"+runNum+".txt";
+      std::ofstream flagOutput(flagOutName.c_str());
       
       std::string line;
       std::getline(inputStream, line);   // Get the first line
@@ -119,18 +134,38 @@ int main()
 	      sipmData.ledValues.push_back(currentLed);
 	      sipmData.temperatures.push_back(currentTemp);
 
-	      if (currentFlags.compare("0_Good") == 0 || currentFlags.compare("0_Good_TooManyLedRatioBad") == 0) {} // Good
+	      if (currentFlags.compare("0_Good") == 0 ||
+		  currentFlags.compare("8_Lrat") == 0 ||
+		  currentFlags.compare("0_Good_TooManyLedRatioBad") == 0 ||
+		  currentFlags.compare("8_Lrat_TooManyLedRatioBad") == 0)
+		{} // Good
 	      else
-		sipmData.flags = "flagsFound";
+		{
+		  sipmData.flags = "flagsFound";
+		  flagOutput << sipmData.id << " " << currentFlags << std::endl;
+		}
 	      
 	      if (fileNameList[i].find("22098020") != std::string::npos)
 		{
 		  sipmData.nominalLed = currentLed;
 		  sipmData.deltaV.push_back(0.0);
+		  if (sipmData.flags.compare("flagsFound") == 0) { sipmData.flagAtVnominal = true; }
 		}
-	      else if (fileNameList[i].find("22098021") != std::string::npos) { sipmData.deltaV.push_back(-0.5); }
-	      else if (fileNameList[i].find("22098022") != std::string::npos) { sipmData.deltaV.push_back(0.5); }
-	      else if (fileNameList[i].find("22098023") != std::string::npos) { sipmData.deltaV.push_back(1.0); }
+	      else if (fileNameList[i].find("22098021") != std::string::npos)
+		{
+		  sipmData.deltaV.push_back(-0.5);
+		  if (sipmData.flags.compare("flagsFound") == 0) { sipmData.flagAtVm0p5 = true; }
+		}
+	      else if (fileNameList[i].find("22098022") != std::string::npos)
+		{
+		  sipmData.deltaV.push_back(0.5);
+		  if (sipmData.flags.compare("flagsFound") == 0) { sipmData.flagAtVp0p5 = true; }
+		}
+	      else if (fileNameList[i].find("22098023") != std::string::npos)
+		{
+		  sipmData.deltaV.push_back(1.0);
+		  if (sipmData.flags.compare("flagsFound") == 0) { sipmData.flagAtVp1p0 = true; }
+		}
 
 	      idToDataMap[currentID] = sipmData;
 	    }
@@ -139,18 +174,38 @@ int main()
 	      idToDataMap[currentID].ledValues.push_back(currentLed);
 	      idToDataMap[currentID].temperatures.push_back(currentTemp);
 
-	      if (currentFlags.compare("0_Good") == 0 || currentFlags.compare("0_Good_TooManyLedRatioBad") == 0) {} // Good
-	      else 
-		idToDataMap[currentID].flags = "flagsFound";
+	      if (currentFlags.compare("0_Good") == 0 ||
+		  currentFlags.compare("8_Lrat") == 0 ||
+		  currentFlags.compare("0_Good_TooManyLedRatioBad") == 0 ||
+		  currentFlags.compare("8_Lrat_TooManyLedRatioBad") == 0)
+		{} // Good
+	      else
+		{
+		  idToDataMap[currentID].flags = "flagsFound";
+		  flagOutput << idToDataMap[currentID].id << " " << currentFlags << std::endl;
+		}
 	      
 	      if (fileNameList[i].find("22098020") != std::string::npos)
 		{
 		  idToDataMap[currentID].nominalLed = currentLed;
 		  idToDataMap[currentID].deltaV.push_back(0.0);
+		  if (idToDataMap[currentID].flags.compare("flagsFound") == 0) { idToDataMap[currentID].flagAtVnominal = true; }
 		}
-	      else if (fileNameList[i].find("22098021") != std::string::npos) { idToDataMap[currentID].deltaV.push_back(-0.5); }
-	      else if (fileNameList[i].find("22098022") != std::string::npos) { idToDataMap[currentID].deltaV.push_back(0.5); }
-	      else if (fileNameList[i].find("22098023") != std::string::npos) { idToDataMap[currentID].deltaV.push_back(1.0); }
+	      else if (fileNameList[i].find("22098021") != std::string::npos)
+		{
+		  idToDataMap[currentID].deltaV.push_back(-0.5);
+		  if (idToDataMap[currentID].flags.compare("flagsFound") == 0) { idToDataMap[currentID].flagAtVm0p5 = true; }
+		}
+	      else if (fileNameList[i].find("22098022") != std::string::npos)
+		{
+		  idToDataMap[currentID].deltaV.push_back(0.5);
+		  if (idToDataMap[currentID].flags.compare("flagsFound") == 0) { idToDataMap[currentID].flagAtVp0p5 = true; }
+		}
+	      else if (fileNameList[i].find("22098023") != std::string::npos)
+		{
+		  idToDataMap[currentID].deltaV.push_back(1.0);
+		  if (idToDataMap[currentID].flags.compare("flagsFound") == 0) { idToDataMap[currentID].flagAtVp1p0 = true; }
+		}
 	    }
 
 
@@ -159,6 +214,7 @@ int main()
 	}// End while over input lines
 
       inputStream.close();
+      flagOutput.close();
 
       std::cout << "File " << i+1 << " read in..." << std::endl;
     }// End for loop over file names
@@ -308,13 +364,22 @@ int main()
 	  else if (it->second.deltaV.at(i) == 1.0) indexP1p0 = i;
 	}
 
+
+      if ((it->first.substr(0,1)).compare("E") == 0 && it->second.idNumber < 660 && !it->second.flagAtVm0p5)
+	{
+	  E_normLED_R1to30_Vm0p5->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed);
+	  E_rawLED_R1to30_Vm0p5->Fill(it->second.ledValues.at(indexM0p5));
+	}
+      else if ((it->first.substr(0,1)).compare("E") == 0 && it->second.idNumber >= 660 && !it->second.flagAtVm0p5)
+	{
+	  E_normLED_R31to34_Vm0p5->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed);
+	  E_rawLED_R31to34_Vm0p5->Fill(it->second.ledValues.at(indexM0p5));
+	}
+      
       if ((it->second.flags).compare("none") == 0)
 	{
 	  if ((it->first.substr(0,1)).compare("E") == 0 && it->second.idNumber < 660)
 	    {
-	      E_normLED_R1to30_Vm0p5->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed);
-	      E_rawLED_R1to30_Vm0p5->Fill(it->second.ledValues.at(indexM0p5));
-
 	      if (avgTemp >= 22.0 && avgTemp < 23.0)
 		{ E_normLED_R1to30_Vm0p5_temp22to23->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
 	      else if (avgTemp >= 23.0 && avgTemp < 24.0)
@@ -332,9 +397,6 @@ int main()
 	    }
 	  else if ((it->first.substr(0,1)).compare("E") == 0 && it->second.idNumber >= 660)
 	    {
-	      E_normLED_R31to34_Vm0p5->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed);
-	      E_rawLED_R31to34_Vm0p5->Fill(it->second.ledValues.at(indexM0p5));
-
 	      if (avgTemp >= 22.0 && avgTemp < 23.0)
 		{ E_normLED_R31to34_Vm0p5_temp22to23->Fill(it->second.ledValues.at(indexM0p5) / it->second.nominalLed); }
 	      else if (avgTemp >= 23.0 && avgTemp < 24.0)
@@ -408,6 +470,25 @@ int main()
 
   totalResultsFile->Close();
   tempStabilityFile->Close();
+
+
+  TCanvas *c1 = new TCanvas("c1", "c1", 700, 600);
+
+  E_normLED_R1to30_Vm0p5->SetFillColorAlpha(kBlue, 0.4);
+  E_normLED_R31to34_Vm0p5->SetFillColorAlpha(kBlue, 0.4);
+
+  gStyle->SetOptFit(1);
+
+  E_normLED_R1to30_Vm0p5->Fit("gaus");
+  E_normLED_R31to34_Vm0p5->Fit("gaus");
+
+  E_normLED_R1to30_Vm0p5->Draw();
+  c1->SaveAs("E_normLED_R1to30_Vm0p5.png");
+  c1->Clear();
+
+  E_normLED_R31to34_Vm0p5->Draw();
+  c1->SaveAs("E_normLED_R31to34_Vm0p5.png");
+  c1->Clear();
 
   delete totalResultsFile;
   delete tempStabilityFile;
